@@ -1,5 +1,7 @@
 package taco.web;
-import org.springframework.validation.*;
+
+
+import java.util.Date;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.support.SessionStatus;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import taco.TacoOrder;
+import taco.data.OrderRepository;
 
 @Slf4j
 @Controller
@@ -19,37 +22,46 @@ import taco.TacoOrder;
 @SessionAttributes("tacoOrder")
 public class OrderController {
 
-  @GetMapping("/current")
-  public String orderForm() {
-    return "orderForm";
-  }
+    private OrderRepository orderRepo;
 
+    public OrderController(OrderRepository orderRepo) {
+        this.orderRepo = orderRepo;
+    }
 
-  @PostMapping
-  public String processOrder(@Valid TacoOrder order, Errors errors,
-          SessionStatus sessionStatus) {
-      
-      if (errors.hasErrors()){
+    @GetMapping("/current")
+    public String orderForm() {
         return "orderForm";
     }
-      
-    log.info("Order submitted: {}", order);
-    sessionStatus.setComplete();
 
-    return "redirect:/";
-  }
+    @PostMapping
+    public String processOrder(@Valid TacoOrder order, Errors errors,
+            SessionStatus sessionStatus) {
 
+        if (errors.hasErrors()) {
+            return "orderForm";
+        }
+        
+        order.setPlacedAt(new Date());
+        
+        orderRepo.save(order);
+        //log.info("Order submitted: {}", order);
+        sessionStatus.setComplete();
 
-  /*@PostMapping
-  public String processOrder(@Valid TacoOrder order, Errors errors,
-          SessionStatus sessionStatus) {
-    if (errors.hasErrors()) {
-      return "orderForm";
+        return "redirect:/";
     }
 
-    log.info("Order submitted: {}", order);
-    sessionStatus.setComplete();
-
-    return "redirect:/";
-  }*/
+    /*
+     * @PostMapping
+     * public String processOrder(@Valid TacoOrder order, Errors errors,
+     * SessionStatus sessionStatus) {
+     * if (errors.hasErrors()) {
+     * return "orderForm";
+     * }
+     * 
+     * log.info("Order submitted: {}", order);
+     * sessionStatus.setComplete();
+     * 
+     * return "redirect:/";
+     * }
+     */
 }

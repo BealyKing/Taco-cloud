@@ -1,6 +1,7 @@
 #tag::setDatabaseName[]
 spring:
-  datasource:
-    generate-unique-name: false
-    name: tacocloud
+  cassandra:
+    keyspace-name: tacocloud
+    schema-action: create-if-not-exists
+    local-datacenter: datacenter1
 #end::setDatabaseName[]

@@ -2,6 +2,7 @@ package taco.web;
 
 
 import java.util.Date;
+import java.util.UUID;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -41,7 +42,10 @@ public class OrderController {
             return "orderForm";
         }
         
-        order.setPlacedAt(new Date());
+        if (order.getId() == null) {
+            order.setId(UUID.randomUUID()); // Или другая стратегия генерации ID
+        }
+        
         
         orderRepo.save(order);
         //log.info("Order submitted: {}", order);

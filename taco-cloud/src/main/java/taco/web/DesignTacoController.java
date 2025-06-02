@@ -21,18 +21,19 @@ import taco.Ingredient;
 import taco.Ingredient.Type;
 import taco.Taco;
 import taco.TacoOrder;
+import taco.TacoUDT;
 import taco.data.IngredientRepository;
 
 @Slf4j
 @Controller
 @RequestMapping("/design")
 @SessionAttributes("tacoOrder")
-public class DesignTacoContoller {
+public class DesignTacoController {
 
     private final IngredientRepository ingredientRepo;
 
     @Autowired
-    public DesignTacoContoller(
+    public DesignTacoController(
             IngredientRepository ingredientRepo) {
         this.ingredientRepo = ingredientRepo;
     }
@@ -72,7 +73,7 @@ public class DesignTacoContoller {
             return "design";
         }
 
-        tacoOrder.addTaco(taco);
+        tacoOrder.addTaco(new TacoUDT(taco.getName(), taco.getIngredients()));
         log.info("Processing taco: {}", taco);
         return "redirect:/orders/current";
     }

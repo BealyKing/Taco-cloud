@@ -3,39 +3,39 @@ package taco;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import org.springframework.data.cassandra.core.cql.Ordering;
+import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
+import org.springframework.data.cassandra.core.mapping.Column;
+import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
+import org.springframework.data.cassandra.core.mapping.Table;
+
 import jakarta.validation.constraints.Size;
-
 import jakarta.validation.constraints.NotNull;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-@Entity
-@EqualsAndHashCode(exclude = "createdAt")
+@Table("tacos")
 public class Taco {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @PrimaryKeyColumn(type=PrimaryKeyType.PARTITIONED)
+    private UUID id;
 
     @NotNull
-    @Size(min = 1, message = "You must choose at least 1 ingredient")
+    @Size(min = 1, message = "You must choose at least 5 ingredient")
     private String name;
 
+    @PrimaryKeyColumn(type=PrimaryKeyType.CLUSTERED, 
+            ordering = Ordering.DESCENDING)
     private Date createdAt = new Date();
 
     @Size(min = 1, message = "You must choose at least 1 ingredient")
-    @ManyToMany()
-    private List<Ingredient> ingredients = new ArrayList<>();
+    @Column("ingredients")
+    private List<IngredientUDT> ingredients = new ArrayList<>();
 
     public void addIngredient(Ingredient ingredient) {
-        this.ingredients.add(ingredient);
+        this.ingredients.add(TacoUDRUtils.toIngredientUDT(ingredient));
     }
 }
